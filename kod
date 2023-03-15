@@ -1,0 +1,108 @@
+import numpy as np
+import random
+import time
+import csv
+from matplotlib import pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+#1
+
+number = 1000000
+#Границы
+lower = -100
+higher = 100
+ms1 = np.random.randint(lower, higher, number)
+ms2 = np.random.randint(lower, higher, number)
+
+rand_list1=[]
+rand_list2=[]
+for i in range(number):
+    rand_list1.append(random.randint(lower,higher))
+for i in range(number):
+    rand_list2.append(random.randint(lower,higher))
+
+#Время через numpy
+StartNP = time.perf_counter()
+npComposition = np.multiply(ms1, ms2)
+TimeNP = time.perf_counter() - StartNP
+
+#Время через лист
+StartList = time.perf_counter()
+listComposition = []
+for i in range(number):
+    listComposition.append(rand_list1[i]*rand_list2[i])
+TimeList = time.perf_counter() - StartList
+
+#2
+
+with open("data2.csv", encoding='windows-1251') as r_file:
+    incl_col = [5]
+    data1 = []
+    file_reader = csv.reader(r_file, delimiter = ",")
+    for row in file_reader:
+       col = list(row[i] for i in incl_col)
+       data1.append(col)
+
+
+
+    time=[]
+    PDZ = []
+    PDZnor = []
+    max = 0
+    count = 0
+    for i in range(7186):
+        if count == 0:
+            count +=1
+        else:
+            if float(data1[i][0]) > max: max = float(data1[i][0])
+            PDZ.append(float(data1[i][0]))
+
+    koef = max / 100
+    for i in range(7185):
+
+        PDZnor.append(PDZ[i]/koef)
+    f_std = np.std(PDZnor)
+    print("Отклонение")
+    print(f_std)
+    fig, (axs, ax2) = plt.subplots(1, 2,
+                            figsize=(10, 7),
+                            tight_layout=True)
+
+    axs.hist(PDZ, bins=500)
+    ax2.hist(PDZnor, bins=500)
+
+    axs.set_facecolor('seashell')
+
+    fig.set_facecolor('floralwhite')
+    fig.set_figwidth(12)  # ширина
+    fig.set_figheight(6)  # высота
+    # Show plot
+    plt.show()
+
+#3
+
+x = np.linspace(-3, 3, 1000)
+y = x * np.cos(x)
+z = np.sin(x)
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.plot(x, y, z, label='parametric curve')
+plt.show()
+
+#4
+
+fig, ax = plt.subplots()
+x = np.arange(0, 4*np.pi, 0.001)
+y = np.sin(x)
+line = plt.plot(x, y)
+ax.set_title('y = sin(x)')
+ax = plt.axis([0, 4 * np.pi, -1.1, 1.1])
+dot, = plt.plot([0], [np.sin(0)], 'go')
+
+def func(i):
+    dot.set_data(i, np.sin(i))
+    return dot,
+
+animation = FuncAnimation(fig, func, frames=np.arange(0, 4 * np.pi, 0.1), interval=100, repeat=True)
+plt.show()
