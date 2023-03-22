@@ -2,6 +2,8 @@ import numpy as np
 import random
 import time
 import csv
+import matplotlib
+matplotlib.use('TkAgg')
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 
@@ -33,51 +35,37 @@ for i in range(number):
     listComposition.append(rand_list1[i]*rand_list2[i])
 TimeList = time.perf_counter() - StartList
 
+print(TimeNP)
+print(TimeList)
 #2
 
-with open("data2.csv", encoding='windows-1251') as r_file:
-    incl_col = [5]
-    data1 = []
-    file_reader = csv.reader(r_file, delimiter = ",")
-    for row in file_reader:
-       col = list(row[i] for i in incl_col)
-       data1.append(col)
+def hist1():
+    arr = np.genfromtxt('data2.csv', delimiter=',', skip_header=1)[:, 4]
+    column = arr[np.isfinite(arr)]
+    fig = plt.figure(figsize=(6, 4))
+    ox = fig.add_subplot()
+    ox.set_title('гистограмма')
+    ox.set_xlabel('интервалы')
+    ox.set_ylabel('колличество значений, попавших в заданые интервалы')
+    ox.hist(column, 16)
+    ox.grid()
 
+def hist2():
+    arr = np.genfromtxt('data2.csv', delimiter=',', skip_header=1)[:, 4]
+    column = arr[np.isfinite(arr)]
 
+    fig = plt.figure(figsize=(6, 4))
+    ox1 = fig.add_subplot()
+    ox1.set_title('нормализованная гистограмма')
+    ox1.hist(column, 16, density=True)
+    ox1.set_xlabel('интервалы')
+    ox1.set_ylabel('вероятность')
+    ox1.grid()
 
-    time=[]
-    PDZ = []
-    PDZnor = []
-    max = 0
-    count = 0
-    for i in range(7186):
-        if count == 0:
-            count +=1
-        else:
-            if float(data1[i][0]) > max: max = float(data1[i][0])
-            PDZ.append(float(data1[i][0]))
-
-    koef = max / 100
-    for i in range(7185):
-
-        PDZnor.append(PDZ[i]/koef)
-    f_std = np.std(PDZnor)
-    print("Отклонение")
-    print(f_std)
-    fig, (axs, ax2) = plt.subplots(1, 2,
-                            figsize=(10, 7),
-                            tight_layout=True)
-
-    axs.hist(PDZ, bins=500)
-    ax2.hist(PDZnor, bins=500)
-
-    axs.set_facecolor('seashell')
-
-    fig.set_facecolor('floralwhite')
-    fig.set_figwidth(12)  # ширина
-    fig.set_figheight(6)  # высота
-    # Show plot
     plt.show()
+
+    print(f'среднеквадратическое отклонение - {np.std(column)}')
+
 
 #3
 
